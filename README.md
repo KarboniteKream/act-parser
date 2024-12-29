@@ -43,6 +43,12 @@ The same works for the `notes.json` file:
 In this case, the **notes** field of any transaction with the payee `GOOGLE*GSUITE`
 will be changed to `G Suite`.
 
+## Notes
+To avoid committing changes to the `data` directory, run the following:
+```bash
+git update-index --skip-worktree data/*.json
+```
+
 [saison]: https://www.saisoncard.co.jp
 [smbc]: https://www.smbc-card.com
 [actual]: https://actualbudget.org
