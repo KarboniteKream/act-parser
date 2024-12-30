@@ -11,9 +11,9 @@ To use this script, download a CSV file from one of the supported sites, and run
 
 The output will be in CSV format, which can be [imported][import] into Actual:
 ```csv
-Date,Payee,Notes,Category,Amount
-2024-12-01,GitHub,Sponsors,Donations,-500
-2024-12-02,Open Collective,Actual,Donations,-1000
+"Date","Payee","Notes","Category","Amount"
+"2024-12-01","GitHub","Sponsors","Donations","-500"
+"2024-12-02","Open Collective","Actual","Donations","-1000"
 ```
 
 ## Configuration

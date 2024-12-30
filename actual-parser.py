@@ -27,8 +27,7 @@ def find_entry(data, payee):
 
 
 def get_payee(payee):
-    entry = find_entry(PAYEE, payee)
-    return entry or payee
+    return find_entry(PAYEE, payee) or payee
 
 
 def get_notes(payee, notes):
@@ -43,8 +42,7 @@ def get_notes(payee, notes):
 
 
 def get_category(payee):
-    entry = find_entry(CATEGORY, payee)
-    return entry or ""
+    return find_entry(CATEGORY, payee) or ""
 
 
 def format_row(date, payee, notes, amount):
@@ -54,7 +52,8 @@ def format_row(date, payee, notes, amount):
     payee = get_payee(payee)
     amount = f"{-float(amount):g}"
 
-    return [date, payee, notes, category, amount]
+    row = [date, payee, notes, category, amount]
+    return list(map(lambda item: f'"{item}"', row))
 
 
 def handle_saison(row):
@@ -79,7 +78,7 @@ def handle_smbc_finalized(row):
 
 if len(sys.argv) < 2:
     print(f"Usage: {sys.argv[0]} <CSV-FILE>")
-    exit(1)
+    sys.exit(1)
 
 csv_file = sys.argv[1]
 
@@ -91,27 +90,26 @@ CATEGORY = load_data("category")
 with open(csv_file, newline="", encoding="shift_jis") as file:
     rows = list(csv.reader(file, delimiter=","))
 
-    if len(rows) == 0:
-        print("ERROR: No data in file!")
-        sys.exit(1)
+if len(rows) == 0:
+    print("ERROR: No data in file!")
+    sys.exit(1)
 
-    if rows[0] == ["カード名称", "ＪＱ　ＣＡＲＤセゾン"]:
-        # Remove headers.
-        rows = rows[5:]
-        handler = handle_saison
-    else:  # SMBC.
-        if "**-****-****" in rows[0][1]:
-            # Remove account names.
-            rows = list(filter(lambda row: len(row) > 3, rows))
-            # Remove row with month total.
-            rows = rows[:-1]
-            handler = handle_smbc_finalized
-        else:
-            handler = handle_smbc_current
+if rows[0] == ["カード名称", "ＪＱ　ＣＡＲＤセゾン"]:
+    # Remove headers.
+    rows = rows[5:]
+    handler = handle_saison
+elif "**-****-****" in rows[0][1]:
+    # Remove account names.
+    rows = list(filter(lambda row: len(row) > 3, rows))
+    # Remove row with month total.
+    rows = rows[:-1]
+    handler = handle_smbc_finalized
+else:
+    handler = handle_smbc_current
 
-    output = filter(lambda row: row is not None, map(handler, rows))
-    output = sorted(output, key=lambda row: row[0])
+output = filter(lambda row: row is not None, map(handler, rows))
+output = sorted(output, key=lambda row: row[0])
 
-    print("Date,Payee,Notes,Category,Amount")
-    for row in output:
-        print(",".join(row))
+print('"Date","Payee","Notes","Category","Amount"')
+for row in output:
+    print(",".join(row))
